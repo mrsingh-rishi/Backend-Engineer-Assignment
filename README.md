@@ -368,7 +368,9 @@ npm run test:load
 
 ## 📚 Additional Resources
 
-- **[System Design Document](./SYSTEM_DESIGN.md)**: Comprehensive architecture overview
+- **[System Design Document](./SYSTEM_DESIGN.md)**: Comprehensive architecture overview with detailed API flows and inter-service communication patterns
+- **[Postman Collection](./postman/)**: Complete API testing collection with examples and environment setup
+- **[API Test Results](./tests/API_TEST_RESULTS.md)**: Comprehensive test results (29 tests, 93% success rate)
 - **[API Specification](./docs/api-spec.yml)**: OpenAPI/Swagger specification
 - **[Database Design](./database/schema.sql)**: Complete database schema
 - **[Deployment Guide](./docs/deployment.md)**: Detailed deployment instructions
