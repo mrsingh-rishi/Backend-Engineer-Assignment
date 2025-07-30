@@ -1,13 +1,14 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
 import compression from 'compression';
-import swaggerUi from 'swagger-ui-express';
+import cors from 'cors';
+import express from 'express';
+import helmet from 'helmet';
 import { createServer } from 'http';
+import swaggerUi from 'swagger-ui-express';
 
 import { config } from './config/config';
 import { connectDatabase } from './config/database';
-import { getKafkaProducer } from './config/kafka';
+import { getKafkaProducer, initializeKafka } from './config/kafka';
+import { connectRedis } from './config/redis';
 import { swaggerSpec } from './config/swagger';
 import { logger } from './utils/logger';
 
@@ -62,6 +63,10 @@ class DeliveryAgentApp {
       const db = await connectDatabase();
       logger.info('Database connected successfully');
 
+      // Connect to Redis
+      await connectRedis();
+      logger.info('Redis connected successfully');
+
       // Initialize Kafka producer
       const kafkaProducer = await getKafkaProducer();
       logger.info('Kafka producer connected successfully');
@@ -106,6 +111,9 @@ class DeliveryAgentApp {
 
   async start(): Promise<void> {
     try {
+      // Initialize Kafka first
+      await initializeKafka();
+      
       await this.setupRoutes();
 
       this.server = createServer(this.app);

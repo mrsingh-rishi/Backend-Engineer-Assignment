@@ -144,6 +144,7 @@ async function testRestaurantService() {
   console.log('\n🔍 Testing Restaurant Service APIs...\n');
   
   const RESTAURANT_SERVICE_URL = 'http://localhost:3002';
+  let createdRestaurantId = '';
 
   const tests = [
     {
@@ -155,10 +156,18 @@ async function testRestaurantService() {
       }
     },
     {
-      name: 'Get Restaurants',
+      name: 'Get All Restaurants',
       test: async () => {
         const response = await axios.get(`${RESTAURANT_SERVICE_URL}/restaurants`);
-        console.log('✅ Restaurants:', response.data);
+        console.log('✅ Get All Restaurants:', response.data);
+        return response.status === 200;
+      }
+    },
+    {
+      name: 'Get Restaurant by ID',
+      test: async () => {
+        const response = await axios.get(`${RESTAURANT_SERVICE_URL}/restaurants/1`);
+        console.log('✅ Get Restaurant by ID:', response.data);
         return response.status === 200;
       }
     },
@@ -166,16 +175,97 @@ async function testRestaurantService() {
       name: 'Get Restaurant Menu',
       test: async () => {
         const response = await axios.get(`${RESTAURANT_SERVICE_URL}/restaurants/1/menu`);
-        console.log('✅ Menu:', response.data);
+        console.log('✅ Get Restaurant Menu:', response.data);
         return response.status === 200;
+      }
+    },
+    {
+      name: 'Create Restaurant',
+      test: async () => {
+        const restaurantData = {
+          name: 'Test Restaurant',
+          cuisine: 'Italian',
+          address: '456 Restaurant St',
+          phone: '+1234567890',
+          email: 'test@restaurant.com',
+          description: 'A test restaurant'
+        };
+        const response = await axios.post(`${RESTAURANT_SERVICE_URL}/restaurants`, restaurantData);
+        console.log('✅ Create Restaurant:', response.data);
+        createdRestaurantId = response.data.id;
+        return response.status === 201;
+      }
+    },
+    {
+      name: 'Update Restaurant',
+      test: async () => {
+        if (!createdRestaurantId) {
+          createdRestaurantId = '1'; // fallback to existing restaurant
+        }
+        const updateData = {
+          name: 'Updated Test Restaurant',
+          description: 'Updated description'
+        };
+        const response = await axios.put(`${RESTAURANT_SERVICE_URL}/restaurants/${createdRestaurantId}`, updateData);
+        console.log('✅ Update Restaurant:', response.data);
+        return response.status === 200;
+      }
+    },
+    {
+      name: 'Add Menu Item',
+      test: async () => {
+        const restaurantId = createdRestaurantId || '1';
+        const menuItem = {
+          name: 'Test Pizza',
+          description: 'A delicious test pizza',
+          price: 15.99,
+          category: 'Pizza',
+          available: true
+        };
+        const response = await axios.post(`${RESTAURANT_SERVICE_URL}/restaurants/${restaurantId}/menu`, menuItem);
+        console.log('✅ Add Menu Item:', response.data);
+        return response.status === 201;
+      }
+    },
+    {
+      name: 'Get Restaurant Orders',
+      test: async () => {
+        const response = await axios.get(`${RESTAURANT_SERVICE_URL}/orders`);
+        console.log('✅ Get Restaurant Orders:', response.data);
+        return response.status === 200;
+      }
+    },
+    {
+      name: 'Update Order Status',
+      test: async () => {
+        const statusUpdate = { status: 'confirmed' };
+        const response = await axios.put(`${RESTAURANT_SERVICE_URL}/orders/1/status`, statusUpdate);
+        console.log('✅ Update Order Status:', response.data);
+        return response.status === 200;
+      }
+    },
+    {
+      name: 'Get Non-existent Restaurant',
+      test: async () => {
+        try {
+          await axios.get(`${RESTAURANT_SERVICE_URL}/restaurants/999`);
+          return false; // Should not reach here
+        } catch (error) {
+          console.log('✅ Non-existent Restaurant correctly rejected:', error.response?.status);
+          return error.response?.status === 404;
+        }
       }
     }
   ];
 
   for (const { name, test } of tests) {
     try {
-      await test();
-      console.log(`✅ ${name} - PASSED`);
+      const result = await test();
+      if (result) {
+        console.log(`✅ ${name} - PASSED`);
+      } else {
+        console.log(`❌ ${name} - FAILED`);
+      }
     } catch (error) {
       console.log(`❌ ${name} - FAILED:`, error.response?.data || error.message);
     }

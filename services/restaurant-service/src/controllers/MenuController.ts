@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { MenuService } from '../services/MenuService';
+import { NextFunction, Request, Response } from 'express';
 import { CreateMenuItemRequest, UpdateMenuItemRequest } from '../models/types';
+import { MenuService } from '../services/MenuService';
 import { logger } from '../utils/logger';
-import '../types/express';
 
 class AppError extends Error {
   constructor(public override message: string, public statusCode: number) {

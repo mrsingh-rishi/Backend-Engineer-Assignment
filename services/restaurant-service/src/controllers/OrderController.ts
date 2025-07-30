@@ -1,8 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { OrderService } from '../services/OrderService';
+import { NextFunction, Request, Response } from 'express';
 import { RestaurantOrderStatus } from '../models/types';
+import { OrderService } from '../services/OrderService';
 import { logger } from '../utils/logger';
-import '../types/express';
 
 class AppError extends Error {
   constructor(public override message: string, public statusCode: number) {
