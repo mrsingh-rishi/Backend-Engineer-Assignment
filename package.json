@@ -1,0 +1,40 @@
+{
+  "name": "food-delivery-backend",
+  "version": "1.0.0",
+  "description": "A production-ready food delivery backend with microservices architecture",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "npm install && cd services/user-service && npm install && cd ../restaurant-service && npm install && cd ../delivery-service && npm install",
+    "build:all": "cd services/user-service && npm run build && cd ../restaurant-service && npm run build && cd ../delivery-service && npm run build",
+    "dev": "concurrently \"npm run dev:user\" \"npm run dev:restaurant\" \"npm run dev:delivery\"",
+    "dev:user": "cd services/user-service && npm run dev",
+    "dev:restaurant": "cd services/restaurant-service && npm run dev",
+    "dev:delivery": "cd services/delivery-service && npm run dev",
+    "start": "concurrently \"npm run start:user\" \"npm run start:restaurant\" \"npm run start:delivery\"",
+    "start:user": "cd services/user-service && npm start",
+    "start:restaurant": "cd services/restaurant-service && npm start",
+    "start:delivery": "cd services/delivery-service && npm start",
+    "test": "npm run test:user && npm run test:restaurant && npm run test:delivery",
+    "test:user": "cd services/user-service && npm test",
+    "test:restaurant": "cd services/restaurant-service && npm test",
+    "test:delivery": "cd services/delivery-service && npm test",
+    "migrate": "cd services/user-service && npm run migrate",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "food-delivery",
+    "microservices",
+    "typescript",
+    "express",
+    "postgresql",
+    "redis",
+    "kafka"
+  ],
+  "author": "Food Delivery Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
