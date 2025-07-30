@@ -1,0 +1,1538 @@
+{
+  "info": {
+    "name": "Food Delivery Backend API",
+    "description": "Complete API collection for the food delivery microservices system with User Service, Restaurant Service, and Delivery Agent Service",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Auto-set base URLs if not defined",
+          "if (!pm.environment.get('user_service_url')) {",
+          "    pm.environment.set('user_service_url', 'http://localhost:3001');",
+          "}",
+          "if (!pm.environment.get('restaurant_service_url')) {",
+          "    pm.environment.set('restaurant_service_url', 'http://localhost:3002');",
+          "}",
+          "if (!pm.environment.get('delivery_service_url')) {",
+          "    pm.environment.set('delivery_service_url', 'http://localhost:3003');",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "user_service_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "restaurant_service_url",
+      "value": "http://localhost:3002",
+      "type": "string"
+    },
+    {
+      "key": "delivery_service_url",
+      "value": "http://localhost:3003",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🚀 Health Checks",
+      "item": [
+        {
+          "name": "User Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{user_service_url}}/health",
+              "host": ["{{user_service_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Restaurant Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{restaurant_service_url}}/health",
+              "host": ["{{restaurant_service_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delivery Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{delivery_service_url}}/health",
+              "host": ["{{delivery_service_url}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👤 User Service APIs",
+      "item": [
+        {
+          "name": "🔐 Authentication",
+          "item": [
+            {
+              "name": "Register User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set('jwt_token', response.data.token);",
+                      "        console.log('JWT token saved:', response.data.token);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, City, State 12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/register",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Login User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set('jwt_token', response.data.token);",
+                      "        console.log('JWT token saved:', response.data.token);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/login",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/refresh",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "refresh"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/logout",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "logout"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "🏪 Restaurant Discovery",
+          "item": [
+            {
+              "name": "Get All Restaurants",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants?page=1&limit=10",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Restaurants by Location",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants/search?lat=37.7749&lng=-122.4194&radius=5&cuisine=italian",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants", "search"],
+                  "query": [
+                    {
+                      "key": "lat",
+                      "value": "37.7749"
+                    },
+                    {
+                      "key": "lng",
+                      "value": "-122.4194"
+                    },
+                    {
+                      "key": "radius",
+                      "value": "5"
+                    },
+                    {
+                      "key": "cuisine",
+                      "value": "italian"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Restaurant Details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants/:restaurantId",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants", ":restaurantId"],
+                  "variable": [
+                    {
+                      "key": "restaurantId",
+                      "value": "{{restaurant_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Restaurant Menu",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants/:restaurantId/menu",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants", ":restaurantId", "menu"],
+                  "variable": [
+                    {
+                      "key": "restaurantId",
+                      "value": "{{restaurant_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "📦 Order Management",
+          "item": [
+            {
+              "name": "Place Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.id) {",
+                      "        pm.environment.set('order_id', response.data.id);",
+                      "        console.log('Order ID saved:', response.data.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"restaurantId\": \"{{restaurant_id}}\",\n  \"items\": [\n    {\n      \"menuItemId\": \"item-1\",\n      \"quantity\": 2,\n      \"specialInstructions\": \"Extra spicy\"\n    },\n    {\n      \"menuItemId\": \"item-2\",\n      \"quantity\": 1\n    }\n  ],\n  \"deliveryAddress\": {\n    \"street\": \"456 Oak Ave\",\n    \"city\": \"San Francisco\",\n    \"state\": \"CA\",\n    \"zipCode\": \"94102\",\n    \"coordinates\": {\n      \"lat\": 37.7849,\n      \"lng\": -122.4094\n    },\n    \"instructions\": \"Ring the doorbell twice\"\n  },\n  \"paymentMethod\": \"credit_card\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Order Details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders/:orderId",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders", ":orderId"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get User Orders",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders?status=active&page=1&limit=10",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "active"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Cancel Order",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Changed my mind\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders/:orderId/cancel",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "cancel"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "👤 User Profile",
+          "item": [
+            {
+              "name": "Get User Profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/user/profile",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "user", "profile"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update User Profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Updated Doe\",\n  \"phone\": \"+1987654321\",\n  \"address\": \"789 New Street, Updated City, State 54321\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/user/profile",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "user", "profile"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🍽️ Restaurant Service APIs",
+      "item": [
+        {
+          "name": "🥘 Menu Management",
+          "item": [
+            {
+              "name": "Get Menu Items",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/menu?category=main&available=true",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "menu"],
+                  "query": [
+                    {
+                      "key": "category",
+                      "value": "main"
+                    },
+                    {
+                      "key": "available",
+                      "value": "true"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Menu Item",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.id) {",
+                      "        pm.environment.set('menu_item_id', response.data.id);",
+                      "        console.log('Menu Item ID saved:', response.data.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Margherita Pizza\",\n  \"description\": \"Classic pizza with tomato sauce, mozzarella, and fresh basil\",\n  \"price\": 14.99,\n  \"category\": \"main\",\n  \"isAvailable\": true,\n  \"preparationTime\": 20,\n  \"allergens\": [\"gluten\", \"dairy\"],\n  \"nutritionalInfo\": {\n    \"calories\": 250,\n    \"protein\": 12,\n    \"carbs\": 30,\n    \"fat\": 8\n  },\n  \"imageUrl\": \"https://example.com/pizza.jpg\"\n}"
+                },
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/menu",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "menu"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Menu Item",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Premium Margherita Pizza\",\n  \"price\": 16.99,\n  \"isAvailable\": true\n}"
+                },
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/menu/:menuItemId",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "menu", ":menuItemId"],
+                  "variable": [
+                    {
+                      "key": "menuItemId",
+                      "value": "{{menu_item_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Menu Item",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/menu/:menuItemId",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "menu", ":menuItemId"],
+                  "variable": [
+                    {
+                      "key": "menuItemId",
+                      "value": "{{menu_item_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "📋 Order Processing",
+          "item": [
+            {
+              "name": "Get Restaurant Orders",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/orders?status=pending&page=1&limit=10",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "orders"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "pending"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Order Status",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"preparing\",\n  \"estimatedReadyTime\": \"2024-01-15T14:30:00Z\",\n  \"notes\": \"Order is being prepared\"\n}"
+                },
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/orders/:orderId/status",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "status"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Accept Order",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"estimatedPreparationTime\": 25,\n  \"notes\": \"Order accepted and will be ready in 25 minutes\"\n}"
+                },
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/orders/:orderId/accept",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "accept"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reject Order",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Kitchen is too busy\",\n  \"estimatedAvailableTime\": \"2024-01-15T16:00:00Z\"\n}"
+                },
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/orders/:orderId/reject",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "reject"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "📊 Analytics",
+          "item": [
+            {
+              "name": "Get Restaurant Analytics",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/analytics?period=week",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "analytics"],
+                  "query": [
+                    {
+                      "key": "period",
+                      "value": "week"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Sales Report",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/analytics/sales?startDate=2024-01-01&endDate=2024-01-31",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "analytics", "sales"],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "2024-01-01"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2024-01-31"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🚚 Delivery Agent Service APIs",
+      "item": [
+        {
+          "name": "👤 Agent Management",
+          "item": [
+            {
+              "name": "Get Agent Profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/agents/profile",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "agents", "profile"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Agent Profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"vehicleType\": \"motorcycle\",\n  \"licenseNumber\": \"DL123456789\",\n  \"isActive\": true\n}"
+                },
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/agents/profile",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "agents", "profile"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Agent Location",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"latitude\": 37.7749,\n  \"longitude\": -122.4194,\n  \"speed\": 25,\n  \"bearing\": 180\n}"
+                },
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/agents/location",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "agents", "location"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Agent Availability",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isAvailable\": true\n}"
+                },
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/agents/availability",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "agents", "availability"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Active Delivery",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/agents/active-delivery",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "agents", "active-delivery"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Agent Stats",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/agents/stats?startDate=2024-01-01&endDate=2024-01-31",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "agents", "stats"],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "2024-01-01"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2024-01-31"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "📦 Delivery Orders",
+          "item": [
+            {
+              "name": "Get Order Details",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/orders/:orderId",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "orders", ":orderId"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Accept Order",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/orders/:orderId/accept",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "accept"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reject Order",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Too far from current location\"\n}"
+                },
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/orders/:orderId/reject",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "reject"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Order Status",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"en_route_to_restaurant\",\n  \"notes\": \"On my way to pick up the order\",\n  \"proofOfDelivery\": null\n}"
+                },
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/orders/:orderId/status",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "orders", ":orderId", "status"],
+                  "variable": [
+                    {
+                      "key": "orderId",
+                      "value": "{{order_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🧪 Testing Workflows",
+      "item": [
+        {
+          "name": "Complete Order Flow",
+          "item": [
+            {
+              "name": "1. Register User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('User registration successful', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.token) {",
+                      "        pm.environment.set('jwt_token', response.data.token);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Test User\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Test St, Test City, TC 12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/register",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "2. Get Restaurants",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Restaurants fetched successfully', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.length > 0) {",
+                      "        pm.environment.set('restaurant_id', response.data[0].id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "3. Place Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Order placed successfully', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.id) {",
+                      "        pm.environment.set('order_id', response.data.id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"restaurantId\": \"{{restaurant_id}}\",\n  \"items\": [\n    {\n      \"menuItemId\": \"item-1\",\n      \"quantity\": 2\n    }\n  ],\n  \"deliveryAddress\": {\n    \"street\": \"456 Test Ave\",\n    \"city\": \"Test City\",\n    \"state\": \"TC\",\n    \"zipCode\": \"12345\",\n    \"coordinates\": {\n      \"lat\": 37.7749,\n      \"lng\": -122.4194\n    }\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "4. Restaurant Accept Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Order accepted by restaurant', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"estimatedPreparationTime\": 20\n}"
+                },
+                "url": {
+                  "raw": "{{restaurant_service_url}}/api/orders/{{order_id}}/accept",
+                  "host": ["{{restaurant_service_url}}"],
+                  "path": ["api", "orders", "{{order_id}}", "accept"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "5. Delivery Agent Accept Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Order accepted by delivery agent', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{jwt_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{delivery_service_url}}/api/orders/{{order_id}}/accept",
+                  "host": ["{{delivery_service_url}}"],
+                  "path": ["api", "orders", "{{order_id}}", "accept"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -13,13 +13,6 @@ import { logger } from './utils/logger';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFoundHandler';
 
-// Routes
-import authRoutes from './routes/auth';
-import restaurantRoutes from './routes/restaurants';
-import orderRoutes from './routes/orders';
-import ratingRoutes from './routes/ratings';
-import healthRoutes from './routes/health';
-
 // Load environment variables
 dotenv.config();
 
@@ -70,13 +63,6 @@ app.use(express.urlencoded({ extended: true }));
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
-// Routes
-app.use('/health', healthRoutes);
-app.use('/api/auth', authRoutes);
-app.use('/api/restaurants', restaurantRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/ratings', ratingRoutes);
-
 // Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
@@ -95,6 +81,20 @@ async function startServer() {
     // Connect to Kafka
     await connectKafka();
     logger.info('Kafka connected successfully');
+
+    // Import routes after database connection is established
+    const { default: healthRoutes } = await import('./routes/health');
+    const { default: authRoutes } = await import('./routes/auth');
+    const { default: restaurantRoutes } = await import('./routes/restaurants');
+    const { default: orderRoutes } = await import('./routes/orders');
+    const { default: ratingRoutes } = await import('./routes/ratings');
+
+    // Setup routes
+    app.use('/health', healthRoutes);
+    app.use('/api/auth', authRoutes);
+    app.use('/api/restaurants', restaurantRoutes);
+    app.use('/api/orders', orderRoutes);
+    app.use('/api/ratings', ratingRoutes);
 
     // Start server
     app.listen(PORT, () => {
