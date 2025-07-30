@@ -1,7 +1,23 @@
 import { Router } from 'express';
+import { MenuController } from '../controllers/MenuController';
+import { MenuService } from '../services/MenuService';
 import { authenticateToken, requireRestaurant } from '../middleware/auth';
+import { getDatabase } from '../config/database';
 
 const router = Router();
+
+// Initialize services and controllers
+let menuController: MenuController;
+
+// Lazy initialization to ensure database is ready
+const getMenuController = () => {
+  if (!menuController) {
+    const db = getDatabase();
+    const menuService = new MenuService(db);
+    menuController = new MenuController(menuService);
+  }
+  return menuController;
+};
 
 /**
  * @swagger
@@ -10,44 +26,38 @@ const router = Router();
  *   description: Menu management endpoints
  */
 
-// GET /api/menu
-router.get('/', authenticateToken, requireRestaurant, (req, res) => {
-  res.json({
-    success: true,
-    message: 'Get menu items endpoint - implementation in progress',
-    data: {
-      service: 'Restaurant Service',
-      endpoint: '/menu',
-      status: 'under development'
-    },
-  });
-});
+// Menu item routes
+router.get('/', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().getMenuItems(req, res, next)
+);
 
-// POST /api/menu
-router.post('/', authenticateToken, requireRestaurant, (req, res) => {
-  res.json({
-    success: true,
-    message: 'Create menu item endpoint - implementation in progress',
-    data: {
-      service: 'Restaurant Service',
-      endpoint: '/menu',
-      status: 'under development'
-    },
-  });
-});
+router.post('/', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().createMenuItem(req, res, next)
+);
 
-// PUT /api/menu/:id
-router.put('/:id', authenticateToken, requireRestaurant, (req, res) => {
-  res.json({
-    success: true,
-    message: 'Update menu item endpoint - implementation in progress',
-    data: {
-      service: 'Restaurant Service',
-      endpoint: `/menu/${req.params.id}`,
-      status: 'under development'
-    },
-  });
-});
+router.get('/categories', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().getMenuCategories(req, res, next)
+);
+
+router.patch('/bulk-availability', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().bulkUpdateAvailability(req, res, next)
+);
+
+router.get('/:id', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().getMenuItem(req, res, next)
+);
+
+router.put('/:id', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().updateMenuItem(req, res, next)
+);
+
+router.delete('/:id', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().deleteMenuItem(req, res, next)
+);
+
+router.patch('/:id/availability', authenticateToken, requireRestaurant, (req: any, res, next) => 
+  getMenuController().updateMenuItemAvailability(req, res, next)
+);
 
 // DELETE /api/menu/:id
 router.delete('/:id', authenticateToken, requireRestaurant, (req, res) => {

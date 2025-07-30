@@ -73,6 +73,52 @@ export enum OrderStatus {
   CANCELLED = 'cancelled',
 }
 
+export type RestaurantOrderStatus = 
+  | 'pending'
+  | 'confirmed'
+  | 'preparing'
+  | 'ready_for_pickup'
+  | 'out_for_delivery'
+  | 'delivered'
+  | 'cancelled';
+
+export interface RestaurantOrder {
+  id: string;
+  userId: string;
+  restaurantId: string;
+  status: RestaurantOrderStatus;
+  totalAmount: number;
+  deliveryFee: number;
+  tax: number;
+  deliveryAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentMethod: string;
+  estimatedDeliveryTime?: Date;
+  specialInstructions?: string;
+  customer: {
+    name: string;
+    email: string;
+    phone?: string;
+  };
+  items: OrderItem[];
+  createdAt: Date;
+  updatedAt: Date;
+  confirmedAt?: Date;
+  preparingAt?: Date;
+  readyAt?: Date;
+  outForDeliveryAt?: Date;
+  deliveredAt?: Date;
+}
+
 export interface DeliveryAgent {
   id: string;
   userId: string;
@@ -194,12 +240,12 @@ export interface UpdateRestaurantProfileRequest {
 }
 
 export interface UpdateOrderStatusRequest {
-  status: OrderStatus;
+  status: RestaurantOrderStatus;
   estimatedDeliveryTime?: string;
 }
 
 export interface OrderFilters {
-  status?: OrderStatus;
+  status?: RestaurantOrderStatus;
   startDate?: string;
   endDate?: string;
   page?: number;
