@@ -60,13 +60,13 @@ app.get('/health', (req, res) => {
 
 // User Service Routes
 if (SERVICE_TYPE === 'user') {
-  app.post('/auth/register', (req, res) => {
+  app.post('/api/auth/register', (req, res) => {
     const newUser = { id: Date.now().toString(), ...req.body };
     mockUsers.push(newUser);
     res.status(201).json({ user: newUser, token: 'mock-jwt-token' });
   });
 
-  app.post('/auth/login', (req, res) => {
+  app.post('/api/auth/login', (req, res) => {
     const user = mockUsers.find(u => u.email === req.body.email);
     if (user) {
       res.json({ user, token: 'mock-jwt-token' });
@@ -75,27 +75,27 @@ if (SERVICE_TYPE === 'user') {
     }
   });
 
-  app.get('/users/profile', (req, res) => {
+  app.get('/api/auth/profile', (req, res) => {
     res.json(mockUsers[0]);
   });
 
-  app.put('/users/profile', (req, res) => {
+  app.put('/api/auth/profile', (req, res) => {
     Object.assign(mockUsers[0], req.body);
     res.json(mockUsers[0]);
   });
 
   // Order management
-  app.post('/orders', (req, res) => {
+  app.post('/api/orders', (req, res) => {
     const newOrder = { id: Date.now().toString(), ...req.body, status: 'pending', createdAt: new Date().toISOString() };
     mockOrders.push(newOrder);
     res.status(201).json(newOrder);
   });
 
-  app.get('/orders', (req, res) => {
+  app.get('/api/orders', (req, res) => {
     res.json(mockOrders);
   });
 
-  app.get('/orders/:id', (req, res) => {
+  app.get('/api/orders/:id', (req, res) => {
     const order = mockOrders.find(o => o.id === req.params.id);
     if (order) {
       res.json(order);

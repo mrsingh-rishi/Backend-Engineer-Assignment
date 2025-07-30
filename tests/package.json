@@ -1,0 +1,16 @@
+{
+  "name": "api-tests",
+  "version": "1.0.0",
+  "description": "API tests for food delivery backend",
+  "main": "api-test-runner.js",
+  "scripts": {
+    "test": "node api-test-runner.js",
+    "test:user": "node -e \"require('./api-test-runner').testUserService()\"",
+    "test:restaurant": "node -e \"require('./api-test-runner').testRestaurantService()\"",
+    "test:delivery": "node -e \"require('./api-test-runner').testDeliveryService()\"",
+    "test:all": "node api-test-runner.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0"
+  }
+}
