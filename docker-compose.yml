@@ -123,7 +123,7 @@ services:
   # Delivery Agent Service
   delivery-service:
     build:
-      context: ./services/delivery-service
+      context: ./services/delivery-agent-service
       dockerfile: Dockerfile
     container_name: food_delivery_delivery_service
     ports:
