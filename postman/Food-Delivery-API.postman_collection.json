@@ -1,0 +1,491 @@
+{
+  "info": {
+    "name": "Food Delivery API",
+    "description": "Complete API collection for Food Delivery Backend Services",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Set base URLs for different services",
+          "pm.environment.set('user_service_url', 'http://localhost:3001');",
+          "pm.environment.set('restaurant_service_url', 'http://localhost:3002');",
+          "pm.environment.set('delivery_service_url', 'http://localhost:3003');"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "user_service_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "restaurant_service_url",
+      "value": "http://localhost:3002",
+      "type": "string"
+    },
+    {
+      "key": "delivery_service_url",
+      "value": "http://localhost:3003",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "restaurant_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Register User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.to.have.status(201)) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set('auth_token', response.data.token);",
+                      "    pm.environment.set('user_id', response.data.user.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"John Doe\",\n  \"phone\": \"+1234567890\",\n  \"address\": \"123 Main St, City, State 12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/register",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              }
+            },
+            {
+              "name": "Login User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.to.have.status(200)) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set('auth_token', response.data.token);",
+                      "    pm.environment.set('user_id', response.data.user.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/login",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              }
+            },
+            {
+              "name": "Get User Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/profile",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "profile"]
+                }
+              }
+            },
+            {
+              "name": "Update User Profile",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"John Smith\",\n  \"phone\": \"+1234567891\",\n  \"address\": \"456 Oak Ave, City, State 12345\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/profile",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "profile"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Restaurants",
+          "item": [
+            {
+              "name": "Get Available Restaurants",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.to.have.status(200)) {",
+                      "    const response = pm.response.json();",
+                      "    if (response.data && response.data.length > 0) {",
+                      "        pm.environment.set('restaurant_id', response.data[0].id);",
+                      "    }",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants?page=1&limit=10",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Restaurant by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants/{{restaurant_id}}",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants", "{{restaurant_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Get Restaurant Menu",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants/{{restaurant_id}}/menu",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants", "{{restaurant_id}}", "menu"]
+                }
+              }
+            },
+            {
+              "name": "Search Restaurants",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{user_service_url}}/api/restaurants/search?q=pizza&page=1&limit=10",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "restaurants", "search"],
+                  "query": [
+                    {
+                      "key": "q",
+                      "value": "pizza"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "Place Order",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.to.have.status(201)) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set('order_id', response.data.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"restaurantId\": \"{{restaurant_id}}\",\n  \"items\": [\n    {\n      \"menuItemId\": \"menu-item-uuid\",\n      \"quantity\": 2\n    }\n  ],\n  \"deliveryAddress\": \"123 Main St, City, State 12345\",\n  \"specialInstructions\": \"Please ring the doorbell\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"]
+                }
+              }
+            },
+            {
+              "name": "Get User Orders",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders?page=1&limit=10",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Order by ID",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders/{{order_id}}",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders", "{{order_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Cancel Order",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders/{{order_id}}/cancel",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders", "{{order_id}}", "cancel"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ratings",
+          "item": [
+            {
+              "name": "Submit Rating",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"orderId\": \"{{order_id}}\",\n  \"restaurantRating\": 4,\n  \"restaurantComment\": \"Great food!\",\n  \"deliveryAgentRating\": 5,\n  \"deliveryAgentComment\": \"Very fast delivery\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/ratings",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "ratings"]
+                }
+              }
+            },
+            {
+              "name": "Get User Ratings",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/ratings?page=1&limit=10",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "ratings"],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "User Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{user_service_url}}/health",
+              "host": ["{{user_service_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Restaurant Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{restaurant_service_url}}/health",
+              "host": ["{{restaurant_service_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Delivery Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{delivery_service_url}}/health",
+              "host": ["{{delivery_service_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
