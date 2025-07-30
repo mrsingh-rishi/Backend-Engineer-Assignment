@@ -1,0 +1,350 @@
+{
+  "info": {
+    "name": "Food Delivery Backend - Complete API Collection",
+    "description": "Comprehensive API collection for Food Delivery Backend with User Service, Restaurant Service, and Delivery Agent Service",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "user_service_url",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "restaurant_service_url", 
+      "value": "http://localhost:3002"
+    },
+    {
+      "key": "delivery_service_url",
+      "value": "http://localhost:3003"
+    },
+    {
+      "key": "auth_token",
+      "value": ""
+    },
+    {
+      "key": "agent_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "🏥 Health Checks",
+      "item": [
+        {
+          "name": "User Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{user_service_url}}/health",
+              "host": ["{{user_service_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Restaurant Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{restaurant_service_url}}/health",
+              "host": ["{{restaurant_service_url}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Delivery Service Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{delivery_service_url}}/health",
+              "host": ["{{delivery_service_url}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 User Service APIs",
+      "item": [
+        {
+          "name": "🔐 Authentication",
+          "item": [
+            {
+              "name": "Register User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"name\": \"John Doe\",\n  \"phone\": \"+1-555-0123\",\n  \"address\": \"123 Main Street, Anytown, USA\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/register",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "register"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 201', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "if (pm.response.code === 201) {",
+                      "    const responseJson = pm.response.json();",
+                      "    pm.environment.set('auth_token', responseJson.token);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Login User",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/login",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const responseJson = pm.response.json();",
+                      "    pm.environment.set('auth_token', responseJson.token);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get User Profile",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/auth/profile",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "auth", "profile"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "📦 Order Management",
+          "item": [
+            {
+              "name": "Create Order",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"restaurantId\": \"1\",\n  \"items\": [\n    {\n      \"menuItemId\": \"1\",\n      \"quantity\": 2,\n      \"price\": 12.99\n    }\n  ],\n  \"deliveryAddress\": \"123 Main Street, Anytown, USA\",\n  \"totalAmount\": 25.98\n}"
+                },
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"]
+                }
+              }
+            },
+            {
+              "name": "Get User Orders",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{auth_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{user_service_url}}/api/orders",
+                  "host": ["{{user_service_url}}"],
+                  "path": ["api", "orders"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🏪 Restaurant Service APIs",
+      "item": [
+        {
+          "name": "Get All Restaurants",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{restaurant_service_url}}/restaurants",
+              "host": ["{{restaurant_service_url}}"],
+              "path": ["restaurants"]
+            }
+          }
+        },
+        {
+          "name": "Get Restaurant Menu",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{restaurant_service_url}}/restaurants/1/menu",
+              "host": ["{{restaurant_service_url}}"],
+              "path": ["restaurants", "1", "menu"]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}"
+            },
+            "url": {
+              "raw": "{{restaurant_service_url}}/orders/1/status",
+              "host": ["{{restaurant_service_url}}"],
+              "path": ["orders", "1", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🚚 Delivery Agent Service APIs",
+      "item": [
+        {
+          "name": "Register Agent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mike Driver\",\n  \"phone\": \"+1-555-0987\",\n  \"vehicleType\": \"bike\"\n}"
+            },
+            "url": {
+              "raw": "{{delivery_service_url}}/agents/register",
+              "host": ["{{delivery_service_url}}"],
+              "path": ["agents", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.environment.set('agent_token', responseJson.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Agent Location",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"location\": {\n    \"lat\": 40.7128,\n    \"lng\": -74.0060\n  }\n}"
+            },
+            "url": {
+              "raw": "{{delivery_service_url}}/agents/location",
+              "host": ["{{delivery_service_url}}"],
+              "path": ["agents", "location"]
+            }
+          }
+        },
+        {
+          "name": "Accept Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{delivery_service_url}}/deliveries/1/accept",
+              "host": ["{{delivery_service_url}}"],
+              "path": ["deliveries", "1", "accept"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
