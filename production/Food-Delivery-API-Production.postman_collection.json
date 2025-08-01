@@ -8,8 +8,8 @@
   "variable": [
     {
       "key": "BASE_URL",
-      "value": "http://localhost:3000",
-      "description": "API Base URL - Update this with your deployed URL"
+      "value": "https://food-delivery-9zla5h5hr-rishi-singhs-projects.vercel.app",
+      "description": "Production API Base URL - Live Deployment"
     },
     {
       "key": "AUTH_TOKEN",

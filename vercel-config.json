@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "name": "food-delivery-api",
+  "builds": [
+    {
+      "src": "production/server.js",
+      "use": "@vercel/node@18.x"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/production/server.js"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  },
+  "regions": ["iad1"],
+  "functions": {
+    "production/server.js": {
+      "maxDuration": 30
+    }
+  }
+}
