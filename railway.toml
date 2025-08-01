@@ -1,0 +1,11 @@
+# Railway Configuration
+# Railway auto-detects Node.js projects
+
+# Set these environment variables in Railway dashboard:
+NODE_ENV=production
+JWT_SECRET=your-super-secret-jwt-key-here
+
+# Railway will automatically:
+# - Run: npm install
+# - Start: npm start
+# - Deploy on git push
